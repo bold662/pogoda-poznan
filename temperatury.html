@@ -41,17 +41,22 @@
         y: tavg,
         type: "scatter",
         mode: "lines+text", // linia + wartości
-        line: { color: 'orange', shape: 'spline' },
-        text: tavg.map(t => t.toFixed(1)), // wartości z 1 miejscem po przecinku
+        line: { color: 'orange', shape: 'spline', width: 3 }, // grubsza linia
+        text: tavg.map(t => t.toFixed(1)),
         textposition: "top center",
-        showlegend: false
+        showlegend: false,
+        textfont: { color: "#FFFFFF", size: 18, family: "sans-serif" },
     };
 
     const layout = {
         title: "Średnia temperatura – Poznań (ostatnie 8 dni)",
         margin: { t: 40, l: 40, r: 10, b: 30 },
-        xaxis: { title: "Data" },
-        yaxis: { title: "Temperatura [°C]" }
+        xaxis: { title: "Data", color: "#FFFFFF" },
+        yaxis: { title: "Temperatura [°C]", color: "#FFFFFF" },
+        plot_bgcolor: "#333333",
+        paper_bgcolor: "#333333",
+        titlefont: { color: "#FFFFFF" },
+        dragmode: false
     };
 
     Plotly.newPlot("chart", [trace], layout, {responsive: true, staticPlot: true});
@@ -59,4 +64,3 @@
 </script>
 </body>
 </html>
-
