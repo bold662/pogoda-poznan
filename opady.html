@@ -15,7 +15,7 @@
 (async () => {
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 8); // ostatnie 8 dni
+    start.setDate(end.getDate() - 8);
     const fmt = d => d.toISOString().split("T")[0];
 
     const url = `https://meteostat.p.rapidapi.com/point/daily?lat=52.4069&lon=16.9252&start=${fmt(start)}&end=${fmt(end)}`;
@@ -31,17 +31,20 @@
     const json = await response.json();
     const data = json.data;
 
-    // Filtrujemy tylko wartości liczbowo określone
     const filtered = data.filter(d => d.prcp !== null);
     const dates = filtered.map(d => d.date);
     const prcp = filtered.map(d => d.prcp);
 
+    // automatyczny margines osi Y
+    const yMax = Math.max(...prcp);
+    const yMaxWithMargin = yMax * 1.1;
+
     const trace = {
         x: dates,
         y: prcp,
-        type: "bar",                        // klasyczne słupki
-        marker: { color: 'deepskyblue' },   // kolor słupków
-        text: prcp.map(p => p.toFixed(1)),  // wartości nad słupkami
+        type: "bar",
+        marker: { color: 'deepskyblue' },
+        text: prcp.map(p => p.toFixed(1)),
         textposition: "outside",
         textfont: { color: "#FFFFFF", size: 18, family: "sans-serif" },
         showlegend: false
@@ -51,7 +54,7 @@
         title: "Opady – Poznań (ostatnie 8 dni)",
         margin: { t: 40, l: 40, r: 10, b: 30 },
         xaxis: { title: "Data", color: "#FFFFFF" },
-        yaxis: { title: "Opady [mm]", color: "#FFFFFF" },
+        yaxis: { title: "Opady [mm]", color: "#FFFFFF", range: [0, yMaxWithMargin] },
         plot_bgcolor: "#333333",
         paper_bgcolor: "#333333",
         titlefont: { color: "#FFFFFF" }
