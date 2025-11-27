@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+ď»ż<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Temperatura – Poznań</title>
+<title>Ĺšrednia temperatura â€“ PoznaĹ„</title>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
     body { margin: 0; }
@@ -11,15 +11,12 @@
 </head>
 <body>
 <div id="chart"></div>
-
 <script>
 (async () => {
-    // Obliczamy zakres dat: ostatnie 7 dni
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 7);
-
-    const fmt = d => d.toISOString().split("T")[0]; // yyyy-mm-dd
+    start.setDate(end.getDate() - 8); // ostatnie 8 dni
+    const fmt = d => d.toISOString().split("T")[0];
 
     const url = `https://meteostat.p.rapidapi.com/point/daily?lat=52.4069&lon=16.9252&start=${fmt(start)}&end=${fmt(end)}`;
 
@@ -34,23 +31,30 @@
     const json = await response.json();
     const data = json.data;
 
-    // Wyciągamy dane
-    const dates = data.map(d => d.date);
-    const tmin = data.map(d => d.tmin);
-    const tmax = data.map(d => d.tmax);
-    const tavg = data.map(d => d.tavg);
+    // Filtrujemy tylko wartoĹ›ci liczbowo okreĹ›lone
+    const filtered = data.filter(d => d.tavg !== null);
+    const dates = filtered.map(d => d.date);
+    const tavg = filtered.map(d => d.tavg);
 
-    // Wykres
-    const trace1 = { x: dates, y: tmin, name: "Min", type: "scatter" };
-    const trace2 = { x: dates, y: tavg, name: "Średnia", type: "scatter" };
-    const trace3 = { x: dates, y: tmax, name: "Max", type: "scatter" };
-
-    const layout = {
-        title: "Temperatura – Poznań (ostatnie 7 dni)",
-        margin: { t: 40, l: 40, r: 10, b: 30 }
+    const trace = {
+        x: dates,
+        y: tavg,
+        type: "scatter",
+        mode: "lines+text", // linia + wartoĹ›ci
+        line: { color: 'orange', shape: 'spline' },
+        text: tavg.map(t => t.toFixed(1)), // wartoĹ›ci z 1 miejscem po przecinku
+        textposition: "top center",
+        showlegend: false
     };
 
-    Plotly.newPlot("chart", [trace1, trace2, trace3], layout, {responsive: true});
+    const layout = {
+        title: "Ĺšrednia temperatura â€“ PoznaĹ„ (ostatnie 8 dni)",
+        margin: { t: 40, l: 40, r: 10, b: 30 },
+        xaxis: { title: "Data" },
+        yaxis: { title: "Temperatura [Â°C]" }
+    };
+
+    Plotly.newPlot("chart", [trace], layout, {responsive: true});
 })();
 </script>
 </body>
