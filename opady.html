@@ -15,10 +15,11 @@
 (async () => {
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 8); // 8 dni
+    start.setDate(end.getDate() - 8); // ostatnie 8 dni
     const fmt = d => d.toISOString().split("T")[0];
+
     const url = `https://meteostat.p.rapidapi.com/point/daily?lat=52.4069&lon=16.9252&start=${fmt(start)}&end=${fmt(end)}`;
-    
+
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -26,27 +27,38 @@
             "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
         }
     });
-    
+
     const json = await response.json();
     const data = json.data;
-    const dates = data.map(d => d.date);
-    const prcp = data.map(d => d.prcp);
-    
+
+    // Filtrujemy tylko wartości liczbowo określone
+    const filtered = data.filter(d => d.prcp !== null);
+    const dates = filtered.map(d => d.date);
+    const prcp = filtered.map(d => d.prcp);
+
     const trace = {
         x: dates,
         y: prcp,
-        type: "bar",
-        name: "Opad [mm]"
+        type: "bar",                        // klasyczne słupki
+        marker: { color: 'deepskyblue' },   // kolor słupków
+        text: prcp.map(p => p.toFixed(1)),  // wartości nad słupkami
+        textposition: "outside",
+        textfont: { color: "#FFFFFF", size: 18, family: "sans-serif" },
+        showlegend: false
     };
-    
+
     const layout = {
         title: "Opady – Poznań (ostatnie 8 dni)",
-        margin: { t: 40, l: 40, r: 10, b: 30 }
+        margin: { t: 40, l: 40, r: 10, b: 30 },
+        xaxis: { title: "Data", color: "#FFFFFF" },
+        yaxis: { title: "Opady [mm]", color: "#FFFFFF" },
+        plot_bgcolor: "#333333",
+        paper_bgcolor: "#333333",
+        titlefont: { color: "#FFFFFF" }
     };
-    
+
     Plotly.newPlot("chart", [trace], layout, {responsive: true, staticPlot: true});
 })();
 </script>
 </body>
 </html>
-
