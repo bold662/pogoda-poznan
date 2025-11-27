@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+ď»ż<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Opady – Poznań</title>
+<title>Opady â€“ PoznaĹ„</title>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
     body { margin: 0; }
@@ -11,17 +11,14 @@
 </head>
 <body>
 <div id="chart"></div>
-
 <script>
 (async () => {
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 7);
-
+    start.setDate(end.getDate() - 8); // 8 dni
     const fmt = d => d.toISOString().split("T")[0];
-
     const url = `https://meteostat.p.rapidapi.com/point/daily?lat=52.4069&lon=16.9252&start=${fmt(start)}&end=${fmt(end)}`;
-
+    
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -29,25 +26,24 @@
             "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
         }
     });
-
+    
     const json = await response.json();
     const data = json.data;
-
     const dates = data.map(d => d.date);
     const prcp = data.map(d => d.prcp);
-
+    
     const trace = {
         x: dates,
         y: prcp,
         type: "bar",
         name: "Opad [mm]"
     };
-
+    
     const layout = {
-        title: "Opady – Poznań (ostatnie 7 dni)",
+        title: "Opady â€“ PoznaĹ„ (ostatnie 8 dni)",
         margin: { t: 40, l: 40, r: 10, b: 30 }
     };
-
+    
     Plotly.newPlot("chart", [trace], layout, {responsive: true});
 })();
 </script>
