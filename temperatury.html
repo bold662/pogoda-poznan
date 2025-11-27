@@ -15,7 +15,7 @@
 (async () => {
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 8); // ostatnie 8 dni
+    start.setDate(end.getDate() - 8);
     const fmt = d => d.toISOString().split("T")[0];
 
     const url = `https://meteostat.p.rapidapi.com/point/daily?lat=52.4069&lon=16.9252&start=${fmt(start)}&end=${fmt(end)}`;
@@ -31,28 +31,34 @@
     const json = await response.json();
     const data = json.data;
 
-    // Filtrujemy tylko wartości liczbowo określone
     const filtered = data.filter(d => d.tavg !== null);
     const dates = filtered.map(d => d.date);
     const tavg = filtered.map(d => d.tavg);
+
+    // Dynamiczny zakres osi Y z 10% marginesem
+    const yMin = Math.min(...tavg);
+    const yMax = Math.max(...tavg);
+    const yMargin = (yMax - yMin) * 0.1;
+    const yMinWithMargin = yMin - yMargin;
+    const yMaxWithMargin = yMax + yMargin;
 
     const trace = {
         x: dates,
         y: tavg,
         type: "scatter",
-        mode: "lines+text", // linia + wartości
-        line: { color: 'orange', shape: 'spline', width: 3 }, // grubsza linia
+        mode: "lines+text",
+        line: { color: 'orange', shape: 'spline', width: 3 },
         text: tavg.map(t => t.toFixed(1)),
         textposition: "top center",
-        showlegend: false,
         textfont: { color: "#FFFFFF", size: 18, family: "sans-serif" },
+        showlegend: false
     };
 
     const layout = {
         title: "Średnia temperatura – Poznań (ostatnie 8 dni)",
         margin: { t: 40, l: 40, r: 10, b: 30 },
         xaxis: { title: "Data", color: "#FFFFFF" },
-        yaxis: { title: "Temperatura [°C]", color: "#FFFFFF" },
+        yaxis: { title: "Temperatura [°C]", color: "#FFFFFF", range: [yMinWithMargin, yMaxWithMargin] },
         plot_bgcolor: "#333333",
         paper_bgcolor: "#333333",
         titlefont: { color: "#FFFFFF" },
