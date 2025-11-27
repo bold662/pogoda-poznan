@@ -1,8 +1,8 @@
-ď»ż<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Ĺšrednia temperatura â€“ PoznaĹ„</title>
+<title>Średnia temperatura – Poznań</title>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
     body { margin: 0; }
@@ -31,7 +31,7 @@
     const json = await response.json();
     const data = json.data;
 
-    // Filtrujemy tylko wartoĹ›ci liczbowo okreĹ›lone
+    // Filtrujemy tylko wartości liczbowo określone
     const filtered = data.filter(d => d.tavg !== null);
     const dates = filtered.map(d => d.date);
     const tavg = filtered.map(d => d.tavg);
@@ -40,18 +40,18 @@
         x: dates,
         y: tavg,
         type: "scatter",
-        mode: "lines+text", // linia + wartoĹ›ci
+        mode: "lines+text", // linia + wartości
         line: { color: 'orange', shape: 'spline' },
-        text: tavg.map(t => t.toFixed(1)), // wartoĹ›ci z 1 miejscem po przecinku
+        text: tavg.map(t => t.toFixed(1)), // wartości z 1 miejscem po przecinku
         textposition: "top center",
         showlegend: false
     };
 
     const layout = {
-        title: "Ĺšrednia temperatura â€“ PoznaĹ„ (ostatnie 8 dni)",
+        title: "Średnia temperatura – Poznań (ostatnie 8 dni)",
         margin: { t: 40, l: 40, r: 10, b: 30 },
         xaxis: { title: "Data" },
-        yaxis: { title: "Temperatura [Â°C]" }
+        yaxis: { title: "Temperatura [°C]" }
     };
 
     Plotly.newPlot("chart", [trace], layout, {responsive: true});
