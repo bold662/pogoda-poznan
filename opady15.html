@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Opady – Poznań</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<style>
+    body { margin: 0; }
+    #chart { width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<script>
+(async () => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 15);
+    const fmt = d => d.toISOString().split("T")[0];
+
+    const url = `https://meteostat.p.rapidapi.com/point/daily?lat=52.4069&lon=16.9252&start=${fmt(start)}&end=${fmt(end)}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "X-RapidAPI-Key": "47414c2109msh788a167e59cd183p1345a0jsna3e25e8c6c50",
+            "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
+        }
+    });
+
+    const json = await response.json();
+    const data = json.data;
+
+    const filtered = data.filter(d => d.prcp !== null);
+    const dates = filtered.map(d => d.date);
+    const prcp = filtered.map(d => d.prcp);
+
+    // automatyczny margines osi Y
+    const yMax = Math.max(...prcp);
+    const yMaxWithMargin = yMax * 1.1;
+
+    const trace = {
+        x: dates,
+        y: prcp,
+        type: "bar",
+        marker: { color: 'deepskyblue' },
+        text: prcp.map(p => p.toFixed(1)),
+        textposition: "outside",
+        textfont: { color: "#FFFFFF", size: 18, family: "sans-serif" },
+        showlegend: false
+    };
+
+    const layout = {
+        title: "Opady – Poznań (ostatnie 15 dni)",
+        margin: { t: 40, l: 40, r: 10, b: 30 },
+        xaxis: { title: "Data", color: "#FFFFFF" },
+        yaxis: { title: "Opady [mm]", color: "#FFFFFF", range: [0, yMaxWithMargin] },
+        plot_bgcolor: "#333333",
+        paper_bgcolor: "#333333",
+        titlefont: { color: "#FFFFFF" }
+    };
+
+    Plotly.newPlot("chart", [trace], layout, {responsive: true, staticPlot: true});
+})();
+</script>
+</body>
+</html>
