@@ -50,6 +50,28 @@
         showlegend: false
     };
 
+    // --- OZNACZENIA WEEKENDÓW Z PRZESUNIĘCIEM O 12 GODZIN ---
+    const shiftMs = 12 * 3600 * 1000; // 12 godzin w ms
+    const weekendShapes = filtered.map(d => {
+        const day = new Date(d.date);
+        if (day.getDay() === 6 || day.getDay() === 0) {
+            const x0 = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, 0, 0).getTime() - shiftMs;
+            const x1 = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59).getTime() - shiftMs;
+            return {
+                type: "rect",
+                x0: new Date(x0).toISOString(),
+                x1: new Date(x1).toISOString(),
+                y0: 0,
+                y1: 1,
+                xref: "x",
+                yref: "paper",
+                fillcolor: "rgba(255,255,255,0.08)",
+                line: { width: 0 }
+            };
+        }
+        return null;
+    }).filter(s => s !== null);
+
     const layout = {
         title: "Opady – Poznań (ostatnie 8 dni)",
         margin: { t: 40, l: 40, r: 10, b: 30 },
@@ -57,7 +79,8 @@
         yaxis: { title: "Opady [mm]", color: "#FFFFFF", range: [0, yMaxWithMargin] },
         plot_bgcolor: "#333333",
         paper_bgcolor: "#333333",
-        titlefont: { color: "#FFFFFF" }
+        titlefont: { color: "#FFFFFF" },
+        shapes: weekendShapes
     };
 
     Plotly.newPlot("chart", [trace], layout, {responsive: true, staticPlot: true});
